@@ -84,6 +84,10 @@ define
 	 
             % Creation de l interface graphique
 	 Description=td(
+			title: "Prédicteur de texte"
+			text(handle:InputText tdscrollbar:true width:75 height:10 background:white foreground:black glue:nswe wrap:word)
+			text(handle:OutputText tdscrollbar:true width:75 height:10 background:black foreground:white glue:nswe wrap:word)
+         button(text:"Montre moi la suite" width:75 height: 4 foreground:black glue:nswe action:Press)
 			action:proc{$}{Application.exit 0} end % quitte le programme quand la fenetre est fermee
 			)
 	 
