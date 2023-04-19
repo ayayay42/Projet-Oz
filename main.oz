@@ -77,9 +77,9 @@ define
 	 
             % Creation de l interface graphique
 	 Description=td(
-			title: "Text predictor"
-			lr(text(handle:InputText width:50 height:10 background:white foreground:black wrap:word) button(text:"Predict" width:15 action:Press))
-			text(handle:OutputText width:50 height:10 background:black foreground:white glue:w wrap:word)
+			title: "Prédiction de texte"
+			lr(text(handle:InputText width:50 height:10 background:white foreground:black wrap:word) button(text:"Montre moi la suite" width:15 height: 8 foreground:black action:Press))
+			text(handle:OutputText width:68 height:10 background:black foreground:white glue:w wrap:word)
 			action:proc{$}{Application.exit 0} end % quitte le programme quand la fenetre est fermee
 			)
 	 
