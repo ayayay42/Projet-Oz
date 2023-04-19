@@ -29,7 +29,6 @@ define
    %%%                                           | nil
    %%%                  <probability/frequence> := <int> | <float>
    fun {Press}
-      % TODO
       0
    end
    
@@ -40,6 +39,14 @@ define
       skip
    end
    
+   fun {ReadFile FilePath}
+      Save
+      F = {New Open.file init(name:FilePath flags:[read])}
+      {F read(list:Save size:all)}
+      {F close}
+   in
+      Save 
+   end
    %%% Ajouter vos fonctions et procédures auxiliaires ici
 
 
@@ -77,9 +84,6 @@ define
 	 
             % Creation de l interface graphique
 	 Description=td(
-			title: "Prédiction de texte"
-			lr(text(handle:InputText width:50 height:10 background:white foreground:black wrap:word) button(text:"Montre moi la suite" width:15 height: 8 foreground:black action:Press))
-			text(handle:OutputText width:68 height:10 background:black foreground:white glue:w wrap:word)
 			action:proc{$}{Application.exit 0} end % quitte le programme quand la fenetre est fermee
 			)
 	 
