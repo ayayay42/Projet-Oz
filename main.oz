@@ -85,9 +85,9 @@ define
             % Creation de l interface graphique
 	 Description=td(
 			title: "Prédicteur de texte"
-			text(handle:InputText tdscrollbar:true width:75 height:10 background:white foreground:black glue:nswe wrap:word)
-			text(handle:OutputText tdscrollbar:true width:75 height:10 background:black foreground:white glue:nswe wrap:word)
-         button(text:"Montre moi la suite" width:75 height: 4 foreground:black glue:nswe action:Press)
+			td(text(handle:InputText tdscrollbar:true width:74 height:10 background:white foreground:black glue:nswe wrap:word)
+			text(handle:OutputText tdscrollbar:true width:74 height:10 background:black foreground:white glue:nswe wrap:word)
+         lr(button(text:"Montre moi la suite" width:37 height: 4 foreground:black glue:nswe action:Press) button(text:"Quit" width:37 height: 4 foreground:black glue:nswe action:proc{$} {Application.exit 0} end)))
 			action:proc{$}{Application.exit 0} end % quitte le programme quand la fenetre est fermee
 			)
 	 
