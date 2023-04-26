@@ -35,19 +35,82 @@ define
     %%% Lance les N threads de lecture et de parsing qui liront et traiteront tous les fichiers
     %%% Les threads de parsing envoient leur resultat au port Port
    proc {LaunchThreads Port N}
-        % TODO
-      skip
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %%%%%%%     Added    %%%%%%%%%%
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      proc {ThreadsCreator }
    end
    
-   fun {ReadFile FilePath}
-      Save
-      F = {New Open.file init(name:FilePath flags:[read])}
-      {F read(list:Save size:all)}
-      {F close}
-   in
-      Save 
-   end
+
    %%% Ajouter vos fonctions et procédures auxiliaires ici
+   
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%%%%%%%%%%%    READER.OZ       %%%%%%%%%%%%%%
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   fun {ReadLine InFile N}
+      % Cette fonction va chercher la N-ième ligne du fichier passé en argument
+      % @pre: - InFile: un fichier txt
+      %       - N : the number of the line that we're trying to fetch.
+      % @post: Returns the N-th line tat we're trying to fetch.
+      if N==1 then
+         {InFile close}
+         Line
+      else
+         {ReadLine InFile N-1}
+      end
+   end
+
+   fun{ReadLineFromFile File_name Line_N}
+   % Clean function of  ReadLine
+      {ReadLine {New TextFile init(name:"tweets/part_"#File_name#".txt")} Line_N}
+   end
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%%%%%%%%%%%    READER.OZ       %%%%%%%%%%%%%%
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%%%%%%     THREADEDREADERPARSER.OZ    %%%%%%%
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   proc {Parse tweet ?R}
+      % This function takes in a tweet and splits it into elements that would go into a tree/dictionnary (à voir)
+      fun {F String List MotAdditionner}
+         case String
+         of nil then
+            if MotAdditionner == nil then List
+            else {Append List [MotAdditionner]}
+            end
+
+         [] H|T then 
+            case {Char.type H}
+            of lower then {F T List {Append MotAdditionner [H]}} % Le case de base càd le cas ou cùest une lettre
+            [] upper then {F T List {Append MotAdditionner [{Char.toLower H}]}} % We set uppercase letters to lower case
+            [] digit then {F T List {Append MotAdditionner [H]}} % Le cas ou c'est un chiffre
+            % Should i treat punctutaion at this stage too, or should i add this as an extention ???????????????
+            else 
+               if MotAdditionner == nil then {F T List nil}
+               else 
+                  {F T {Append list [MotAdditionner]} nil}
+               end
+            end
+         end
+      R = {F Sentence nil nil}
+      end                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+   end
+
+
+
+
+
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   %%%%%%%     THREADEDREADERPARSER.OZ    %%%%%%%
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+      
+
 
 
    %%% Fetch Tweets Folder from CLI Arguments
@@ -75,7 +138,7 @@ define
       %% se trouvant dans le dossier
       %%% N'appelez PAS cette fonction lors de la phase de
       %%% soumission !!!
-      % {ListAllFiles {OS.getDir TweetsFolder}}
+      %{ListAllFiles {OS.getDir TweetsFolder}}
        
       local NbThreads InputText OutputText Description Window SeparatedWordsStream SeparatedWordsPort in
 	 {Property.put print foo(width:1000 depth:1000)}  % for stdout siz
