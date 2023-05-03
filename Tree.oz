@@ -17,7 +17,7 @@ fun {Insert K W T}
 	case T
 	of leaf then tree(key:Y value:W leaf leaf)
 	[] nil then tree(key:Y value:W nil nil)
-	[] tree(key:Y value:V T1 T2) andthen K==Y then 
+	[] tree(key:Y value:V T1 T2) andthen K==Y then %remplace l'ancienne valeur par la nouvelle
 		tree(key:K value:W T1 T2)
 	[] tree(key:Y value:V T1 T2) andthen K<Y then 
 		tree(key:Y value:V {Insert K W T1} T2)
@@ -62,21 +62,7 @@ fun {StringToAtom Mot}
 	end 
 end
 
-fun {IntToAtom I}
-	case I
-	of 0 then '0'
-	[] 1 then '1'
-	[] 2 then '2'
-	[] 3 then '3'
-	[] 4 then '4'
-	[] 5 then '5'
-	[] 6 then '6'
-	[] 7 then '7'
-	[] 8 then '8'
-	[] 9 then '9'
-	[] _ then {IntToAtom I div 10}#{Char.toAtom {Char.fromInt (I mod 10)}}
-	end
-end
+declare 
 
 fun {IncrScore List} NewScore in
 	case List
@@ -85,11 +71,38 @@ fun {IncrScore List} NewScore in
 		case Score
 		of nil then Mot|'2'|nil
 		[] Diz|Unit then 
-			NewScore = {IntToAtom {StringToInt Diz} + 1}
-			Mot|NewScore|nil 
+            case Unit
+            of nil then 
+                NewScore = {StringToInt Diz} + 1
+                Mot|NewScore|nil
+            end
 		end
 	end
 end
+
+
+Test = {StringToAtom "JeTeste"}
+L = Test|'1'|nil
+L2 = ['TestDeux' 8]
+L3 = ['testTrois' 9]
+
+{Browse {IncrScore L}}
+{Browse {IncrScore L2}}
+{Browse {IncrScore L3}}
+
+declare
+fun {ParcourValue List Mot}
+	%renvoie la valeur incrémentée du mot recherché dans la liste donnée MAIS ne modifie pas la liste donnée
+	case List
+	of nil then nil
+	[] Mot1|ResteMots then 
+		if Mot1.1 == Mot then {IncrScore Mot1}
+		else {ParcourValue ResteMots Mot} end 
+	end 
+end
+
+L = [['non' 1] ['nope' 2] ['test' 12]]
+{Browse {ParcourValue L {StringToAtom "test"}}}
 
 proc {AddInTree Tree Mot MotSuiv ?R}
 	fun {P Tree Mot MotSuiv}
@@ -97,8 +110,8 @@ proc {AddInTree Tree Mot MotSuiv ?R}
 		elseif MotSuiv ==nil then Tree
 		else case {Lookup Mot Tree}
 			of notfound then
-				{Insert Mot {IncrScore MotSuiv} Tree}
-			[] found then  %si le mot est déjà dans l'arbre on regarde sa veleur 
+				{Insert Mot MotSuiv|'1'|nil Tree}
+			[] found then  %si le mot est déjà dans l'arbre on regarde sa valeur 
 				case value
 				of nil then {Insert Mot {IncrScore MotSuiv|nil} Tree}
 				[]H|T then  %si c'est une liste on vérifie si le mot suivant est aussi déjà là
