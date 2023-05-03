@@ -62,34 +62,52 @@ fun {StringToAtom Mot}
 	end 
 end
 
-
-fun {IncrScore List}
-	case List
-	of nil then nil
-	[] Mot|Score then return 
-		
+fun {IntToAtom I}
+	case I
+	of 0 then '0'
+	[] 1 then '1'
+	[] 2 then '2'
+	[] 3 then '3'
+	[] 4 then '4'
+	[] 5 then '5'
+	[] 6 then '6'
+	[] 7 then '7'
+	[] 8 then '8'
+	[] 9 then '9'
+	[] _ then {IntToAtom I div 10}#{Char.toAtom {Char.fromInt (I mod 10)}}
+	end
 end
 
-%si mot pas dans l'arbre: l'ajouter au bon endroit (insert), si déjà là, incr sa value +1
-
-AllWords = AllWords(key:racine value:List)
+fun {IncrScore List} NewScore in
+	case List
+	of nil then ['1']
+	[] Mot|Score then 
+		case Score
+		of nil then Mot|'2'|nil
+		[] Diz|Unit then 
+			NewScore = {IntToAtom {StringToInt Diz} + 1}
+			Mot|NewScore|nil 
+		end
+	end
+end
 
 proc {AddInTree Tree Mot MotSuiv ?R}
-	fun {P Tree Mot MotSuiv} Valeur = nil in
+	fun {P Tree Mot MotSuiv}
 		if Mot==nil then Tree
 		elseif MotSuiv ==nil then Tree
 		else case {Lookup Mot Tree}
 			of notfound then
-				Valeur = [[MotSuiv 1]]
-				{Insert Mot Valeur Tree}
+				{Insert Mot {IncrScore MotSuiv} Tree}
 			[] found then  %si le mot est déjà dans l'arbre on regarde sa veleur 
 				case value
-				of nil then nil
+				of nil then {Insert Mot {IncrScore MotSuiv|nil} Tree}
 				[]H|T then  %si c'est une liste on vérifie si le mot suivant est aussi déjà là
 					case H.1 %on regarde le premier mot de chaque sous-liste
-					of MotSuiv then 
-				{Insert Mot MotSuiv Tree}
-				%incr valeur MAIS COMMENT
+					of MotSuiv then %si c'est le même mot, on augmente son score de 1
+						{Insert Mot {IncrScore MotSuiv} Tree}
+						%si c'est pas le bon mot faut parcourir toute la liste
+					end 
+				end 
 			end
 		end
 	end
