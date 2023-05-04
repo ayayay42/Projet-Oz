@@ -105,23 +105,20 @@ proc {AddInTree Tree Mots MotSuiv ?R}
 		elseif MotSuiv==nil then Tree
 		else case {Lookup Mots Tree}
 			of notfound then 
-				{Insert Mots (MotSuiv|1|nil)|nil Tree} %si la key n'existe pas on l'ajoute
+				{Browse 42}{Insert Mots (MotSuiv|1|nil)|nil Tree} %si la key n'existe pas on l'ajoute
 			[] found then %si la key existe on doit voir si le MotSuiv est déjà dans la value et si oui l'incrémenter si non l'ajouter
-
+				case value
+				of H|T then 
+					{Browse 42}{Insert Mots {ParcourValueAux value MotSuiv nil} Tree}
+				end
+			end
+		end
 	end
 in
-	R = {P Tree {StringToAtom Mot} {StringToAtom MotSuiv}}
+	R = {P Tree {StringToAtom Mots} {StringToAtom MotSuiv}}
 end
 
-fun {AddWordInTree Tree List}
-	case List 
-	of nil then Tree
-	[] Mot|T then
-		case T 
-		of nil then nil %on verra plus tard 
-		[] MotSuiv|Ts then  %check si c'est pas le dernier mot
-			case {Lookup {}}
-end
+T = t(nil nil) %initialiser un arbre vide 
 
 fun {AddSentenceinTree Tree List} %List = liste contenant tous les mots d'un fichier ou d'une phrase
 	case List
