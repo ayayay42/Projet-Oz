@@ -1,5 +1,7 @@
 declare
 
+%%%Fonctions de base pour manipuler les arbres%%%
+
 fun {Lookup K T}
 	case T
 	of leaf then notfound
@@ -11,7 +13,6 @@ fun {Lookup K T}
 		{Lookup K T2}
 	end
 end
-
 
 fun {Insert K W T}
 	case T
@@ -25,9 +26,6 @@ fun {Insert K W T}
 		tree(key:Y value:V T1 {Insert K W T2})
 	end
 end
-
-% Correct version of delete
-% Uses helper function RemoveSmallest
 
 fun {RemoveSmallest T}
 	case T
@@ -55,6 +53,8 @@ fun {Delete K T}
 	end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 fun {StringToAtom Mot}
 	if {Atom.is Mot} then
 		Mot
@@ -64,7 +64,8 @@ end
 
 declare 
 
-fun {IncrScore List} NewScore in
+fun {IncrScore List} %incrémente le score d'un mot de 1 (List est sous la forme: [Mot Score] avec Score en Int)
+	NewScore in  
 	case List
 	of nil then nil
 	[] Mot|Score then 
@@ -80,65 +81,49 @@ fun {IncrScore List} NewScore in
 	end
 end
 
-
-Test = {StringToAtom "JeTeste"}
-L = Test|'99'|nil
-L2 = ['TestDeux' 100]
-L3 = ['testTrois' 999]
-
-{Browse {IncrScore L}}
-{Browse {IncrScore L2}}
-{Browse {IncrScore L3}}
-
-declare
-fun {ParcourValue List Mot}
-	%renvoie la valeur incrémentée du mot recherché dans la liste donnée MAIS ne modifie pas la liste donnée
-	case List
-	of nil then nil
-	[] Mot1|ResteMots then 
-		if Mot1.1 == Mot then {IncrScore Mot1}
-		else {ParcourValue ResteMots Mot} end 
-	end 
-end
-
-fun {ParcourValueAux L Mot Acc}
+fun {ParcourValueAux L Mot Acc} %parcoure les valeurs de la liste L pour voir si Mot est déjà dedans 
+	%si Mot est déjà dans la liste, on incrémente sa valeur de 1
+	%sinon on l'ajoute à la liste avec comme valeur initiale 1
+	%dans les deux cas on retourne la liste modifiée (soir +1 soit mot ajouté)
 	case L
-	of nil then Acc
+	of nil then {Append Acc (Mot|1|nil)|nil}
 	[] Mot1|Suite then
-		if Mot1.1==Mot then {Append Acc {IncrScore Mot1}}
-		else {Browse 42} {ParcourValueAux Suite Mot {Append Acc Mot1}} end
+		if Mot1.1==Mot then {Append {Append Acc {IncrScore Mot1}|nil} Suite}
+		else {ParcourValueAux Suite Mot {Append Acc Mot1|nil}} end
 	end
 end
 
 L4 = [['non' 1] ['nope' 9] ['test' 99]]
-%{Browse {ParcourValue L4 {StringToAtom "test"}}}
+{Browse {ParcourValueAux L4 {StringToAtom "nope"} nil}}
+{Browse {ParcourValueAux L4 {StringToAtom "non"} nil}}
 {Browse {ParcourValueAux L4 {StringToAtom "test"} nil}}
+{Browse {ParcourValueAux L4 {StringToAtom "ttest"} nil}}
 
-proc {AddInTree Tree Mot MotSuiv ?R}
-	fun {P Tree Mot MotSuiv}
-		if Mot==nil then Tree
-		elseif MotSuiv ==nil then Tree
-		else case {Lookup Mot Tree}
-			of notfound then
-				{Insert Mot (MotSuiv|'1'|nil)|nil Tree} %[[mot score]]
-			[] found then  %si le mot est déjà dans l'arbre on regarde sa valeur 
-				case value
-				of nil then {Insert Mot {IncrScore MotSuiv|nil} Tree}
-				[]H|T then  %si c'est une liste on vérifie si le mot suivant est aussi déjà là
-					case H.1 %on regarde le premier mot de chaque sous-liste
-					of MotSuiv then %si c'est le même mot, on augmente son score de 1
-						{Insert Mot {IncrScore MotSuiv} Tree}
-						%si c'est pas le bon mot faut parcourir toute la liste
-					end 
-				end 
-			end
-		end
+proc {AddInTree Tree Mots MotSuiv ?R}
+	fun {P Tree Mots MotSuiv}
+		if Mots==nil then Tree
+		elseif MotSuiv==nil then Tree
+		else case {Lookup Mots Tree}
+			of notfound then 
+				{Insert Mots (MotSuiv|1|nil)|nil Tree} %si la key n'existe pas on l'ajoute
+			[] found then %si la key existe on doit voir si le MotSuiv est déjà dans la value et si oui l'incrémenter si non l'ajouter
+
 	end
 in
 	R = {P Tree {StringToAtom Mot} {StringToAtom MotSuiv}}
 end
 
-fun {AddSentenceinTree Tree List}
+fun {AddWordInTree Tree List}
+	case List 
+	of nil then Tree
+	[] Mot|T then
+		case T 
+		of nil then nil %on verra plus tard 
+		[] MotSuiv|Ts then  %check si c'est pas le dernier mot
+			case {Lookup {}}
+end
+
+fun {AddSentenceinTree Tree List} %List = liste contenant tous les mots d'un fichier ou d'une phrase
 	case List
 	of Mot|T then 
 		case T 
