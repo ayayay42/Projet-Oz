@@ -66,7 +66,7 @@ declare
 
 fun {IncrScore List} NewScore in
 	case List
-	of nil then ['1']
+	of nil then nil
 	[] Mot|Score then 
 		case Score
 		of nil then Mot|'2'|nil
@@ -82,9 +82,9 @@ end
 
 
 Test = {StringToAtom "JeTeste"}
-L = Test|'1'|nil
-L2 = ['TestDeux' 8]
-L3 = ['testTrois' 9]
+L = Test|'99'|nil
+L2 = ['TestDeux' 100]
+L3 = ['testTrois' 999]
 
 {Browse {IncrScore L}}
 {Browse {IncrScore L2}}
@@ -101,8 +101,18 @@ fun {ParcourValue List Mot}
 	end 
 end
 
-L = [['non' 1] ['nope' 2] ['test' 12]]
-{Browse {ParcourValue L {StringToAtom "test"}}}
+fun {ParcourValueAux L Mot Acc}
+	case L
+	of nil then Acc
+	[] Mot1|Suite then
+		if Mot1.1==Mot then {Append Acc {IncrScore Mot1}}
+		else {Browse 42} {ParcourValueAux Suite Mot {Append Acc Mot1}} end
+	end
+end
+
+L4 = [['non' 1] ['nope' 9] ['test' 99]]
+%{Browse {ParcourValue L4 {StringToAtom "test"}}}
+{Browse {ParcourValueAux L4 {StringToAtom "test"} nil}}
 
 proc {AddInTree Tree Mot MotSuiv ?R}
 	fun {P Tree Mot MotSuiv}
@@ -110,7 +120,7 @@ proc {AddInTree Tree Mot MotSuiv ?R}
 		elseif MotSuiv ==nil then Tree
 		else case {Lookup Mot Tree}
 			of notfound then
-				{Insert Mot MotSuiv|'1'|nil Tree}
+				{Insert Mot (MotSuiv|'1'|nil)|nil Tree} %[[mot score]]
 			[] found then  %si le mot est déjà dans l'arbre on regarde sa valeur 
 				case value
 				of nil then {Insert Mot {IncrScore MotSuiv|nil} Tree}
@@ -128,11 +138,10 @@ in
 	R = {P Tree {StringToAtom Mot} {StringToAtom MotSuiv}}
 end
 
-fun {AddSentenceinTree List Tree}
+fun {AddSentenceinTree Tree List}
 	case List
-	of nil then nil
-	[] Mot|T then 
+	of Mot|T then 
 		case T 
 		of nil then List
-		[] MotSuiv|_ then {Insert {StringToAtom H} T.1 Tree} end 
+		[] MotSuiv|_ then {AddSentenceinTree {AddInTree Tree Mot MotSuiv} T}
 end
