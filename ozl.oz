@@ -16,24 +16,30 @@ fun {Concat S1 S2}
 end
 
 %Transforms a string in a list
-fun {StringToList Sentence String Temporary} 
-   case String
-   of nil then {Append Sentence [{StringToAtom  Temporary}]}
-   [] H|T then
-      case {Char.type H}
-      of lower then {StringToList Sentence T {Concat Temporary [H]}}
-      [] upper then {StringToList Sentence T {Concat Temporary [{Char.toLower H}]}}
-      [] digit then {StringToList Sentence T {Concat Temporary [H]}}
-      [] punct then
-	 if Temporary == nil then {StringToList Sentence T nil}
-	 else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
-      [] space then
-	 if Temporary == nil then {StringToList Sentence T nil}
-	 else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
-      else {StringToList Sentence T nil} end
-      
+
+proc {StringToList String ?R}
+   fun {F Sentence String Temporary} 
+      case String
+      of nil then {Append Sentence [{StringToAtom  Temporary}]}
+      [] H|T then
+         case {Char.type H}
+         of lower then {StringToList Sentence T {Concat Temporary [H]}}
+         [] upper then {StringToList Sentence T {Concat Temporary [{Char.toLower H}]}}
+         [] digit then {StringToList Sentence T {Concat Temporary [H]}}
+         [] punct then
+       if Temporary == nil then {StringToList Sentence T nil}
+       else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
+         [] space then
+       if Temporary == nil then {StringToList Sentence T nil}
+       else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
+         else {StringToList Sentence T nil} end
+   
+      end
    end
+in
+   R = {F nil String nil}
 end
+
 
 %TO COMMENT
 fun {ParseBetter Parsed List}
@@ -44,10 +50,7 @@ fun {ParseBetter Parsed List}
       else {ParseBetter T {Append List [{Concat [H] [T.1]}]}} end
    end
 end
- 
-fun {GetFollowingWordList Following}
-   body
-end
+
 %Gets the words that follow the two words passed as an argument
 fun {GetFollowingWord Words Looking Following} 
    %Words: liste de liste avec chaque paire de mots
@@ -57,8 +60,7 @@ fun {GetFollowingWord Words Looking Following}
    of nil then Following
    [] H|T then
       if H == Looking then
-	 {Browse T.1.2.1}
-	 {GetFollowingWord T Looking {ParcourValueAux Following T.1.2.1 nil}}
+	 {GetFollowingWord T Looking {Append Following T.1.2.1}}
       else {GetFollowingWord T Looking Following} end
    end
 end
