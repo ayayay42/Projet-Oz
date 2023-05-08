@@ -22,7 +22,7 @@ fun {GetFollowingWord Words Looking Following}
     of nil then Following
     [] H|T then
        if H == Looking then
-      {GetFollowingWord T Looking {Append Following T.1.2.1}}
+      {GetFollowingWord T Looking {ParcourValueAux Following T.1.2.1 nil}}
        else {GetFollowingWord T Looking Following} end
     end
  end
