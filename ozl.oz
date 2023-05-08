@@ -17,29 +17,24 @@ end
 
 %Transforms a string in a list
 
-proc {StringToList String ?R}
-   fun {F Sentence String Temporary} 
-      case String
-      of nil then {Append Sentence [{StringToAtom  Temporary}]}
-      [] H|T then
-         case {Char.type H}
-         of lower then {StringToList Sentence T {Concat Temporary [H]}}
-         [] upper then {StringToList Sentence T {Concat Temporary [{Char.toLower H}]}}
-         [] digit then {StringToList Sentence T {Concat Temporary [H]}}
-         [] punct then
-       if Temporary == nil then {StringToList Sentence T nil}
-       else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
-         [] space then
-       if Temporary == nil then {StringToList Sentence T nil}
-       else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
-         else {StringToList Sentence T nil} end
-   
-      end
+fun {StringToList Sentence String Temporary} 
+   case String
+   of nil then {Append Sentence [{StringToAtom  Temporary}]}
+   [] H|T then
+      case {Char.type H}
+      of lower then {StringToList Sentence T {Concat Temporary [H]}}
+      [] upper then {StringToList Sentence T {Concat Temporary [{Char.toLower H}]}}
+      [] digit then {StringToList Sentence T {Concat Temporary [H]}}
+      [] punct then
+	 if Temporary == nil then {StringToList Sentence T nil}
+	 else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
+      [] space then
+	 if Temporary == nil then {StringToList Sentence T nil}
+	 else {StringToList {Append Sentence [{StringToAtom  Temporary}]} T nil} end
+      else {StringToList Sentence T nil} end
+      
    end
-in
-   R = {F nil String nil}
 end
-
 
 %TO COMMENT
 fun {ParseBetter Parsed List}
