@@ -28,28 +28,11 @@ in
     {CreateThread P NbThreads 1 NbFichiers}
 end
 
-proc {SendToStream S NbThreads ?R}
-    fun {SendToStreamAux S List NbThreads NbThreadDone}
-        %List: Liste avec tout les mots suivants
-        %NbThreads: nombre de thread au total
-        %NbThreadDone: nmbre de threads finis
-        case S 
-        of H|T then 
-            if H == finished then
-                if NbThreadDone == NbThreads then List
-                else {SendToStreamAux T List NbThreads NbThreadDone+1} end
-            else {SendToStreamAux T {Funct List H} NbThreads NbThreadDone} end
-        end 
-    end
-end
-
-
-fun {CreateList} %Doit return la liste avec toute les valeurs pour l'input
-    proc {CreateListProc NbThreads NbFichiers ?List} S P in
+fun {CreateTree} %Doit return l'arbre avec toutes les poss pour l'input
+    proc {CreateTreeProc NbThreads NbFichiers ?Tree} S P in
         {NewPort S P}
-        %{ParseFiles with threads P NbThreads NbFichiers}
-        List = {SendToStreamAux S NbThreads}
+        {ReaderThread P NbThreads NbFichiers}
     end
 in
-    {CreateListProc 4 208}
+    {CreateTreeProc 4 208}
 end
