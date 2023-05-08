@@ -10,7 +10,7 @@ in
 end
 
 fun {Concat S1 S2} 
-  case S1 of H|T then H|{Concat T S2} [] nil then S2 end
+   case S1 of H|T then H|{Concat T S2} [] nil then S2 end
 end
 
 fun {StringToList Sentence String Temporary}
@@ -32,6 +32,7 @@ fun {StringToList Sentence String Temporary}
    end
 end
 
+
 fun {ParseBetter Parsed List}
    case Parsed
    of nil then List
@@ -41,36 +42,147 @@ fun {ParseBetter Parsed List}
    end
 end
 
+
+
+
 %Gets the words that follow the two words passed as an argument
 fun {GetFollowingWord Words Looking Following}
    case Words
    of nil then Following
    [] H|T then
-      if H == Looking then {GetFollowingWord T Looking {IncrScoreWord T.1.2.1 {Append Following [[T.1.2.1 0]]} nil}}
+      if H == Looking then
+	 %{Browse T.1.2.1}
+	 {GetFollowingWord T Looking {ParcourValueAux Following T.1.2.1 nil}}
       else {GetFollowingWord T Looking Following} end
    end
 end
-%Checks if a word is already in the following word list, increments if it's the case and adds it if not
-fun {IncrScoreWord Word Following FollowingUpdated}
-   case Following
-   of nil then FollowingUpdated
-   [] H|T then if H.1 == Word then
-          {Browse "here"}
-          {Append FollowingUpdated [H.1 {StringToInt H.2.1}+1]|T}
-	       else
-		  {IncrScoreWord Word T {Append FollowingUpdated [H]}}
-           end
+
+
+
+fun {IncrScore List} %incrémente le score d'un mot de 1 (List est sous la forme: [Mot Score] avec Score en Int)
+	NewScore in  
+	case List
+	of nil then nil
+	[] Mot|Score then 
+		case Score
+		of nil then Mot|'2'|nil
+		[] Diz|Unit then 
+            case Unit
+            of nil then 
+                NewScore = {StringToInt Diz} + 1
+                Mot|NewScore|nil
+            end
+ 		end
+	end
+end
+
+
+fun {ParcourValueAux L Mot Acc} %parcoure les valeurs de la liste L pour voir si Mot est déjà dedans 
+	%si Mot est déjà dans la liste, on incrémente sa valeur de 1
+	%sinon on l'ajoute à la liste avec comme valeur initiale 1
+	%dans les deux cas on retourne la liste modifiée (soir +1 soit mot ajouté)
+	case L
+	of nil then {Append Acc (Mot|1|nil)|nil}
+	[] Mot1|Suite then
+		if Mot1.1==Mot then {Append {Append Acc {IncrScore Mot1}|nil} Suite}
+		else {ParcourValueAux Suite Mot {Append Acc Mot1|nil}} end
+	end
+end
+
+fun {ThroughAllFiles N Looking List} A B C in
+   if N == 209 then
+      List
+   else
+      if N == 1 then
+         A = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_"#N#".txt"}
+	 B = {StringToList nil A nil}
+	 C = {ParseBetter B nil}
+	 {ThroughAllFiles N+1 Looking {GetFollowingWord C Looking nil}}
+      else
+	 A = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_"#N#".txt"}
+	 B = {StringToList nil A nil}
+	 C = {ParseBetter B nil}
+	 {ThroughAllFiles N+1 Looking {GetFollowingWord C Looking List}}
+      end
    end
 end
 
 
-{Browse {GetFollowingWord [[my name] [name is] [is nouha] [nouha lo] [lo nil] [nil my] [my name] [name is]] [my name] nil}}
-%{Browse {IncrScoreWord is [[my 1] [name 1] [is 1] [nouha 5]] nil}}
-%{Browse {GetFollowingWord [[my name] [name is] [my name] [is nouha]] [my name] nil}}
+fun {Sort Xs}
+   fun {BubbleSort Xs}
+      case Xs
+      of X1|X2|Xr andthen X2.2.1 > X1.2.1 then
+	 X2|{BubbleSort X1|Xr}
+      [] X1|X2|Xr andthen X1.2.1 >= X2.2.1 then
+	 X1|{BubbleSort X2|Xr}
+      [] X|nil then X|nil
+      end
+   end
 
-%{Browse {StringToAtom{Concat "hey" "you"}}}
+   fun {Sort Xs I}
+      if I > 0 then {Sort {BubbleSort Xs} I-1}
+      else Xs
+      end
+   end
+in
+   {Sort Xs {Length Xs}}
+end
 
 
+
+local S MP TL FL in
+    S = "My name is Nouha []87"
+    MP = {List.map S
+        fun {$ C} % Remplace tous les chars non minuscules et majuscules et chiffres pas des espaces
+            if (C >= 65 andthen C =< 90) orelse (C >= 97 andthen C =< 122) orelse (C >= 48 andthen C =< 57) then
+                {Char.toLower C $}
+            else 32 end
+        end
+        $
+    }
+    TL = {String.tokens MP 32 $} % SPlit sur les espaces, donne une liste contenant les mots du fichiers et parfois des NILS !!
+    FL = {List.filter TL
+        fun {$ E} % Supprime tous les nils de la liste
+            E \= nil
+        end
+        $
+    }
+    % Bon là je vais faire du python, faut que t'arrives à implémenter en déclaratif oz
+    {Browse FL}
+end
+
+%{Browse {Sort {ThroughAllFiles 1 ['of' it] nil}}}
+
+
+
+%{Browse {Sort [[1 2] [5 8] [3 5]]}}
+
+%{Browse {Sort [[a 3] [c 4] [g 2] [f 1] [l 5]]}}
+
+L = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_2.txt"}
+M = {StringToList nil L nil}
+%N =  {ParseBetter M nil}
+{Browse M}
+%{Browse {GetFollowingWord N [must go] nil}}
+
+
+
+
+
+
+
+
+
+%{Browse {StringToList "My name is Nouha" nil nil}}
+
+%{Browse {StringToList "My name is nouha" nil nil }}
+%{Browse {StringToAtom {StringToList {ReadFile "Documents/Projet-Oz/tweets/part_1.txt"} nil nil}}}
+
+
+%{Browse {ParcourValueAux [[is 1] [oui 2]] lo nil}}
+
+
+%{Browse {GetFollowingWord [[my name] [name is] [is nouha]] [my name] nil}}
 
 %fun {InitializeStruct Words List}
 %   case Words
