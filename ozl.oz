@@ -1,6 +1,7 @@
 declare
 
-fun {ReadFile FilePath}
+%stores the content of the file who's path is FilePath in the variable Save
+fun {ReadFile FilePath} 
    Save
    F = {New Open.file init(name:FilePath flags:[read])}
    {F read(list:Save size:all)}
@@ -9,11 +10,13 @@ in
    Save 
 end
 
-fun {Concat S1 S2} 
+%concat two strings 
+fun {Concat S1 S2}  
    case S1 of H|T then H|{Concat T S2} [] nil then S2 end
 end
 
-fun {StringToList Sentence String Temporary}
+%Transforms a string in a list
+fun {StringToList Sentence String Temporary} 
    case String
    of nil then {Append Sentence [{StringToAtom  Temporary}]}
    [] H|T then
@@ -32,7 +35,7 @@ fun {StringToList Sentence String Temporary}
    end
 end
 
-
+%TO COMMENT
 fun {ParseBetter Parsed List}
    case Parsed
    of nil then List
@@ -58,8 +61,8 @@ fun {GetFollowingWord Words Looking Following}
 end
 
 
-
-fun {IncrScore List} %incrémente le score d'un mot de 1 (List est sous la forme: [Mot Score] avec Score en Int)
+%incrémente le score d'un mot de 1 (List est sous la forme: [Mot Score] avec Score en Int)
+fun {IncrScore List} 
 	NewScore in  
 	case List
 	of nil then nil
@@ -76,11 +79,11 @@ fun {IncrScore List} %incrémente le score d'un mot de 1 (List est sous la forme
 	end
 end
 
-
-fun {ParcourValueAux L Mot Acc} %parcoure les valeurs de la liste L pour voir si Mot est déjà dedans 
-	%si Mot est déjà dans la liste, on incrémente sa valeur de 1
-	%sinon on l'ajoute à la liste avec comme valeur initiale 1
-	%dans les deux cas on retourne la liste modifiée (soir +1 soit mot ajouté)
+%parcoure les valeurs de la liste L pour voir si Mot est déjà dedans 
+%si Mot est déjà dans la liste, on incrémente sa valeur de 1
+%sinon on l'ajoute à la liste avec comme valeur initiale 1
+%dans les deux cas on retourne la liste modifiée (soir +1 soit mot ajouté)
+fun {ParcourValueAux L Mot Acc}
 	case L
 	of nil then {Append Acc (Mot|1|nil)|nil}
 	[] Mot1|Suite then
@@ -89,6 +92,7 @@ fun {ParcourValueAux L Mot Acc} %parcoure les valeurs de la liste L pour voir si
 	end
 end
 
+%TO COMMENT
 fun {ThroughAllFiles N Looking List} A B C in
    if N == 209 then
       List
@@ -107,7 +111,7 @@ fun {ThroughAllFiles N Looking List} A B C in
    end
 end
 
-
+%TO COMMENT
 fun {Sort Xs}
    fun {BubbleSort Xs}
       case Xs
@@ -118,7 +122,7 @@ fun {Sort Xs}
       [] X|nil then X|nil
       end
    end
-
+%verif si les fun sont bien identées et nommées
    fun {Sort Xs I}
       if I > 0 then {Sort {BubbleSort Xs} I-1}
       else Xs
@@ -148,7 +152,7 @@ local S MP TL FL in
         $
     }
     % Bon là je vais faire du python, faut que t'arrives à implémenter en déclaratif oz
-    {Browse FL}
+    %{Browse FL}
 end
 
 %{Browse {Sort {ThroughAllFiles 1 ['of' it] nil}}}
@@ -161,9 +165,9 @@ end
 
 L = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_2.txt"}
 M = {StringToList nil L nil}
-%N =  {ParseBetter M nil}
+N =  {ParseBetter M nil}
 {Browse M}
-%{Browse {GetFollowingWord N [must go] nil}}
+{Browse {GetFollowingWord N [must go] nil}}
 
 
 
