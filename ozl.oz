@@ -44,22 +44,24 @@ fun {ParseBetter Parsed List}
       else {ParseBetter T {Append List [{Concat [H] [T.1]}]}} end
    end
 end
-
-
-
-
+ 
+fun {GetFollowingWordList Following}
+   body
+end
 %Gets the words that follow the two words passed as an argument
-fun {GetFollowingWord Words Looking Following}
+fun {GetFollowingWord Words Looking Following} 
+   %Words: liste de liste avec chaque paire de mots
+   %Looking: mot qu'on recherche (input)
+   %Following: liste vide qu'on remplira avec les mots qui suivent l'input
    case Words
    of nil then Following
    [] H|T then
       if H == Looking then
-	 %{Browse T.1.2.1}
+	 {Browse T.1.2.1}
 	 {GetFollowingWord T Looking {ParcourValueAux Following T.1.2.1 nil}}
       else {GetFollowingWord T Looking Following} end
    end
 end
-
 
 %incrémente le score d'un mot de 1 (List est sous la forme: [Mot Score] avec Score en Int)
 fun {IncrScore List} 
@@ -92,18 +94,24 @@ fun {ParcourValueAux L Mot Acc}
 	end
 end
 
+L = {ReadFile "Documents/Projet-Oz/tweets/part_1.txt"}
+M = {StringToList nil L nil}
+N =  {ParseBetter M nil}
+{Browse N}
+{Browse {GetFollowingWord N [must go] nil}}
+
 %TO COMMENT
 fun {ThroughAllFiles N Looking List} A B C in
    if N == 209 then
       List
    else
       if N == 1 then
-         A = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_"#N#".txt"}
+         A = {ReadFile "Documents/Projet-Oz/tweets/part_"#N#".txt"}
 	 B = {StringToList nil A nil}
 	 C = {ParseBetter B nil}
 	 {ThroughAllFiles N+1 Looking {GetFollowingWord C Looking nil}}
       else
-	 A = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_"#N#".txt"}
+	 A = {ReadFile "Documents/Projet-Oz/tweets/part_"#N#".txt"}
 	 B = {StringToList nil A nil}
 	 C = {ParseBetter B nil}
 	 {ThroughAllFiles N+1 Looking {GetFollowingWord C Looking List}}
@@ -132,30 +140,7 @@ in
    {Sort Xs {Length Xs}}
 end
 
-
-
-local S MP TL FL in
-    S = "My name is Nouha []87"
-    MP = {List.map S
-        fun {$ C} % Remplace tous les chars non minuscules et majuscules et chiffres pas des espaces
-            if (C >= 65 andthen C =< 90) orelse (C >= 97 andthen C =< 122) orelse (C >= 48 andthen C =< 57) then
-                {Char.toLower C $}
-            else 32 end
-        end
-        $
-    }
-    TL = {String.tokens MP 32 $} % SPlit sur les espaces, donne une liste contenant les mots du fichiers et parfois des NILS !!
-    FL = {List.filter TL
-        fun {$ E} % Supprime tous les nils de la liste
-            E \= nil
-        end
-        $
-    }
-    % Bon là je vais faire du python, faut que t'arrives à implémenter en déclaratif oz
-    %{Browse FL}
-end
-
-%{Browse {Sort {ThroughAllFiles 1 ['of' it] nil}}}
+{Browse {Sort {ThroughAllFiles 1 ['of' it] nil}}}
 
 
 
@@ -163,17 +148,11 @@ end
 
 %{Browse {Sort [[a 3] [c 4] [g 2] [f 1] [l 5]]}}
 
-L = {ReadFile "Documents/GitHub/Projet-Oz/tweets/part_2.txt"}
-M = {StringToList nil L nil}
-N =  {ParseBetter M nil}
-{Browse M}
-{Browse {GetFollowingWord N [must go] nil}}
-
-
-
-
-
-
+%L = {ReadFile "Documents/Projet-Oz/tweets/part_1.txt"}
+%M = {StringToList nil L nil}
+%N =  {ParseBetter M nil}
+%{Browse M}
+%{Browse {GetFollowingWord N [must go] nil}}
 
 
 
